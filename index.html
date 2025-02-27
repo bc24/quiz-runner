@@ -17,6 +17,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            width: 100vw;
             background-color: #f0f0f0;
             user-select: none;
             overflow: hidden;
@@ -25,15 +26,11 @@
 
         #game {
             position: relative;
-            width: 90vw;
-            height: 90vh;
-            max-width: 800px;
-            max-height: 400px;
+            width: 100vw;
+            height: 100vh;
             background-color: #fff;
             overflow-x: auto;
             overflow-y: hidden;
-            border-radius: 20px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
         }
 
         .block {
@@ -55,15 +52,6 @@
             border-radius: 50%;
         }
 
-        h1 {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 24px;
-            color: #333;
-        }
-
         #points {
             position: absolute;
             top: 20px;
@@ -80,7 +68,6 @@
 </head>
 <body>
     <!-- Entwickler: Frank Panzer | Webseite: Panzerit.de -->
-    <h1>Notiere alles im Klassennotizbuch</h1>
     <div id="points">Punkte: <span id="points-number">0</span></div>
     <div id="game">
         <div class="player" id="player"></div>
@@ -92,23 +79,16 @@
             const game = document.getElementById("game");
             let currentPosition = 10;
             let points = 0;
-            let questions = [];
 
-            console.log("Lade Fragen...");
-
-            fetch("questions.json")
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Fragen konnten nicht geladen werden");
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    questions = data;
-                    console.log("Fragen erfolgreich geladen:", questions);
-                    createRandomBlocks(10);
-                })
-                .catch(error => console.error("Fehler beim Laden der Fragen:", error));
+            const questions = [
+                { "question": "Wie viele Planeten hat unser Sonnensystem?", "answer": "8" },
+                { "question": "Welches ist das längste Fluss der Welt?", "answer": "Nil" },
+                { "question": "Welches ist das höchste Gebirge der Welt?", "answer": "Himalaya" },
+                { "question": "Wer schrieb das Stück 'Romeo und Julia'?", "answer": "William Shakespeare" },
+                { "question": "Was ist die Hauptstadt von Italien?", "answer": "Rom" },
+                { "question": "Welcher Fluss fließt durch London?", "answer": "Thames" },
+                { "question": "Was ist die Hauptstadt von Brasilien?", "answer": "Brasília" }
+            ];
 
             function createRandomBlocks(numBlocks) {
                 if (questions.length === 0) {
@@ -120,13 +100,11 @@
                     const block = document.createElement("div");
                     block.classList.add("block");
                     block.style.left = `${150 + (i * 150)}px`;
-                    block.style.bottom = `${Math.random() * 200 + 50}px`; // Mindesthöhe 50px
+                    block.style.bottom = `${Math.random() * 200 + 50}px`;
 
                     const questionObj = questions[Math.floor(Math.random() * questions.length)];
                     block.setAttribute("data-question", questionObj.question);
                     block.setAttribute("data-answer", questionObj.answer);
-
-                    console.log("Block erstellt mit Frage:", questionObj);
 
                     block.addEventListener("click", () => {
                         const userAnswer = prompt(block.getAttribute("data-question"));
@@ -145,6 +123,8 @@
                     game.appendChild(block);
                 }
             }
+
+            createRandomBlocks(10);
         });
     </script>
 </body>
