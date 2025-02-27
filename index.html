@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block Jump Game</title>
+    <style>
+        /* Copyright by Frank Panzer | Panzerit.de */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            user-select: none;
+        }
+        
+        #game {
+            position: relative;
+            width: 800px;
+            height: 400px;
+            background-color: #fff;
+            overflow-x: auto;
+            border-radius: 20px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+        }
+        
+        .block {
+            width: 100px;
+            height: 20px;
+            background-color: #007BFF;
+            position: absolute;
+            bottom: 0;
+            transition: bottom 0.3s ease;
+            border-radius: 3px;
+        }
+        
+        .player {
+            width: 30px;
+            height: 30px;
+            background-color: #FF5733;
+            position: absolute;
+            bottom: 20px;
+            left: 50px;
+            transition: left 0.3s ease, bottom 0.3s ease;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        h1 {
+            position: absolute;
+            top: 10px;
+            left: 20%;
+            font-size: 24px;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        #points {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            background: #fff;
+            padding: 10px 20px;
+            color: #000;
+            border-radius: 10px;
+            font-family: 'Arial', sans-serif;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Entwickler: Frank Panzer | Webseite: Panzerit.de -->
+    <h1>Notiere alles im Klassennotizbuch</h1>
+    <div id="points">Punkte: <span id="points-number">0</span></div>
+    <div id="game">
+        <div class="player" id="player"></div>
+    </div>
+
+    <script>
+        // Copyright (c) Frank Panzer | Panzerit.de
+        (() => {
+            if (!document.currentScript || !document.currentScript.src.includes("Panzerit.de")) {
+                document.body.innerHTML = '<h1 style="color: red; text-align: center;">Fehlende Copyright-Angabe! Bitte wiederherstellen.</h1>';
+                throw new Error("Copyright entfernt - Spiel gestoppt.");
+            }
+        })();
+        
+        const player = document.getElementById("player");
+        const game = document.getElementById("game");
+        let currentPosition = 50;
+        let points = 0;
+        
+        const encodedQuestions = [
+            "V2FzIGlzdCBkaWUgSGF1cHRzdGFkdCB2b24gRGV1dHNjaGxhbmQ/OkJlcmxpbg==",
+            "V2FzIGlzdCBkZXIgZ3Jvw59lIFBsYW5ldCBpbSBTb25uZW5zeXN0ZW0/Okp1cGl0ZXI=",
+            "V2FzIGlzdCBkaWUgY2hlbWlza2UgRm9ybWVsIGbDtnIgV2Fzc2VyPy5IMk8=",
+            "V2llIHZpZWxlIENvbnRpbmVudGVnZWIgZXMgaW4gZGVyIFdlbGx0Py43",
+            "V2VyIG1hbHRlIGRpZSBNb25hIExpc2E/Okxlb25hcmRvIGRhIFZpbmNp"
+        ];
+        
+        function decodeQuestion(encodedString) {
+            const decodedString = atob(encodedString);
+            const parts = decodedString.split(":");
+            return { question: parts[0], answer: parts[1] };
+        }
+
+        function createRandomBlocks(numBlocks) {
+            for (let i = 0; i < numBlocks; i++) {
+                const block = document.createElement("div");
+                block.classList.add("block");
+                block.style.left = `${150 + (i * 150)}px`;
+                block.style.bottom = `${Math.random() * 200 + 20}px`;
+                
+                const questionObj = decodeQuestion(encodedQuestions[Math.floor(Math.random() * encodedQuestions.length)]);
+                block.setAttribute("data-question", questionObj.question);
+                block.setAttribute("data-answer", questionObj.answer);
+                
+                block.addEventListener("click", () => {
+                    const userAnswer = prompt(block.getAttribute("data-question"));
+                    if (userAnswer && userAnswer.toLowerCase() === block.getAttribute("data-answer").toLowerCase()) {
+                        alert("Richtig! Du kannst weiter springen.");
+                        points++;
+                        document.getElementById("points-number").textContent = points;
+                        currentPosition += 35;
+                        player.style.left = currentPosition + "px";
+                        player.style.bottom = parseInt(block.style.bottom) + 20 + "px";
+                    } else {
+                        alert("Leider falsch! Versuch es noch einmal.");
+                    }
+                });
+                
+                game.appendChild(block);
+            }
+        }
+        
+        createRandomBlocks(10);
+    </script>
+</body>
+</html>
