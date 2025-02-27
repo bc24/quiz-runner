@@ -87,40 +87,27 @@
             const game = document.getElementById("game");
             let currentPosition = 50;
             let points = 0;
+            let questions = [];
 
-            // Fragen-Datenbank (Base64-codiert für Schutz)
-            const encodedQuestions = [
-                "V2FzIGlzdCBkaWUgSGF1cHRzdGFkdCB2b24gRGV1dHNjaGxhbmQ/OkJlcmxpbg==",
-                "V2FzIGlzdCBkZXIgZ3Jvw59lIFBsYW5ldCBpbSBTb25uZW5zeXN0ZW0/Okp1cGl0ZXI=",
-                "V2FzIGlzdCBkaWUgY2hlbWlza2UgRm9ybWVsIGbDtnIgV2Fzc2VyPy5IMk8=",
-                "V2llIHZpZWxlIENvbnRpbmVudGVnZWIgZXMgaW4gZGVyIFdlbGx0Py43",
-                "V2VyIG1hbHRlIGRpZSBNb25hIExpc2E/Okxlb25hcmRvIGRhIFZpbmNp",
-                "V2FzIGlzdCBkYXMgU3ltYm9sIGbDtnIgU2F1ZXJzdG9mZj9O",
-                "V2FzIGlzdCBkZXIgZ3Jvw59lIFN0YWR0IHZvbiBVSz9Mb25kb24=",
-                "V2FzIGlzdCBkZXIgZ2jDpG5nZ3N0ZSBNZWVyIHZvbSBTb25uZW5zeXN0ZW0/Okp1cGl0ZXI=",
-                "V2llIG5lbm50IG1hbiBkaWUgV2lzc2Vuc2NoYWZ0IG3Dtmcgdm9uIFphaGxlbiB6dXNhbW1lbj9FcXVhdG9y" 
-            ];
-
-            function decodeQuestion(encodedString) {
-                try {
-                    const decodedString = atob(encodedString);
-                    const parts = decodedString.split(":");
-                    if (parts.length !== 2) throw new Error("Ungültige Frage-Daten");
-                    return { question: parts[0], answer: parts[1] };
-                } catch (e) {
-                    console.error("Fehler beim Dekodieren der Frage:", e);
-                    return { question: "Fehlerhafte Frage", answer: "Fehler" };
-                }
-            }
+            // Fragen aus der JSON-Datei laden
+            fetch("questions.json")
+                .then(response => response.json())
+                .then(data => {
+                    questions = data;
+                    createRandomBlocks(10); // Erst nach Laden der Fragen Blöcke generieren
+                })
+                .catch(error => console.error("Fehler beim Laden der Fragen:", error));
 
             function createRandomBlocks(numBlocks) {
+                if (questions.length === 0) return; // Falls keine Fragen geladen wurden, abbrechen
+
                 for (let i = 0; i < numBlocks; i++) {
                     const block = document.createElement("div");
                     block.classList.add("block");
                     block.style.left = `${150 + (i * 150)}px`;
                     block.style.bottom = `${Math.random() * 200 + 20}px`;
 
-                    const questionObj = decodeQuestion(encodedQuestions[Math.floor(Math.random() * encodedQuestions.length)]);
+                    const questionObj = questions[Math.floor(Math.random() * questions.length)];
                     block.setAttribute("data-question", questionObj.question);
                     block.setAttribute("data-answer", questionObj.answer);
 
@@ -141,8 +128,6 @@
                     game.appendChild(block);
                 }
             }
-
-            createRandomBlocks(10);
         });
     </script>
 </body>
