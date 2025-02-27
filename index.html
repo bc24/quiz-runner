@@ -6,22 +6,32 @@
     <title>Block Jump Game</title>
     <style>
         /* Copyright by Frank Panzer | Panzerit.de */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
             background-color: #f0f0f0;
             user-select: none;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
         }
 
         #game {
             position: relative;
-            width: 800px;
-            height: 400px;
+            width: 90vw;
+            height: 90vh;
+            max-width: 800px;
+            max-height: 400px;
             background-color: #fff;
             overflow-x: auto;
+            overflow-y: hidden;
             border-radius: 20px;
             box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
         }
@@ -31,45 +41,40 @@
             height: 20px;
             background-color: #007BFF;
             position: absolute;
-            bottom: 0;
-            transition: bottom 0.3s ease;
             border-radius: 3px;
         }
 
         .player {
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             background-color: #FF5733;
             position: absolute;
             bottom: 20px;
-            left: 50px;
+            left: 10px;
             transition: left 0.3s ease, bottom 0.3s ease;
             border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
         h1 {
             position: absolute;
             top: 10px;
-            left: 20%;
+            left: 50%;
+            transform: translateX(-50%);
             font-size: 24px;
             color: #333;
-            font-family: 'Arial', sans-serif;
         }
 
         #points {
             position: absolute;
             top: 20px;
             right: 20px;
-            font-size: 24px;
+            font-size: 18px;
             background: #fff;
-            padding: 10px 20px;
+            padding: 10px 15px;
             color: #000;
             border-radius: 10px;
-            font-family: 'Arial', sans-serif;
             font-weight: bold;
+            box-shadow: 0px 0px 5px rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -85,31 +90,43 @@
         document.addEventListener("DOMContentLoaded", function () {
             const player = document.getElementById("player");
             const game = document.getElementById("game");
-            let currentPosition = 50;
+            let currentPosition = 10;
             let points = 0;
             let questions = [];
 
-            // Fragen aus der JSON-Datei laden
+            console.log("Lade Fragen...");
+
             fetch("questions.json")
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Fragen konnten nicht geladen werden");
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     questions = data;
-                    createRandomBlocks(10); // Erst nach Laden der Fragen Blöcke generieren
+                    console.log("Fragen erfolgreich geladen:", questions);
+                    createRandomBlocks(10);
                 })
                 .catch(error => console.error("Fehler beim Laden der Fragen:", error));
 
             function createRandomBlocks(numBlocks) {
-                if (questions.length === 0) return; // Falls keine Fragen geladen wurden, abbrechen
+                if (questions.length === 0) {
+                    console.error("Keine Fragen verfügbar! Blöcke werden nicht erstellt.");
+                    return;
+                }
 
                 for (let i = 0; i < numBlocks; i++) {
                     const block = document.createElement("div");
                     block.classList.add("block");
                     block.style.left = `${150 + (i * 150)}px`;
-                    block.style.bottom = `${Math.random() * 200 + 20}px`;
+                    block.style.bottom = `${Math.random() * 200 + 50}px`; // Mindesthöhe 50px
 
                     const questionObj = questions[Math.floor(Math.random() * questions.length)];
                     block.setAttribute("data-question", questionObj.question);
                     block.setAttribute("data-answer", questionObj.answer);
+
+                    console.log("Block erstellt mit Frage:", questionObj);
 
                     block.addEventListener("click", () => {
                         const userAnswer = prompt(block.getAttribute("data-question"));
@@ -117,7 +134,7 @@
                             alert("Richtig! Du kannst weiter springen.");
                             points++;
                             document.getElementById("points-number").textContent = points;
-                            currentPosition += 35;
+                            currentPosition += 100;
                             player.style.left = currentPosition + "px";
                             player.style.bottom = parseInt(block.style.bottom) + 20 + "px";
                         } else {
